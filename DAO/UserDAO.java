@@ -44,12 +44,12 @@ public class UserDAO {
                     ps2.executeUpdate();
                 }
 
-                System.out.println("✅ Account Number: " + accountNumber);
+                System.out.println(" Account Number: " + accountNumber);
             }
             return true;
 
         } catch (SQLException e) {
-            System.out.println("❌ Error saving user: " + e.getMessage());
+            System.out.println(" Error saving user: " + e.getMessage());
             return false;
         }
     }
@@ -97,7 +97,7 @@ public class UserDAO {
             return true;
 
         } catch (SQLException e) {
-            System.out.println("❌ Delete error: " + e.getMessage());
+            System.out.println(" Delete error: " + e.getMessage());
             return false;
         }
     }
