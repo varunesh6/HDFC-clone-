@@ -4,7 +4,7 @@ import service.AccountService;
 public class ImplAccService implements AccountService {
     @Override
     public void depositAmount(){
-        System.out.println("deposit Successfuly");
+        
     }
     @Override
     public void withdrawAmount(){

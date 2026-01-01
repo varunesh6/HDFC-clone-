@@ -79,7 +79,7 @@ public class UserDAO {
             }
 
         } catch (SQLException e) {
-            System.out.println("❌ Login error: " + e.getMessage());
+            System.out.println(" Login error: " + e.getMessage());
         }
         return null;
     }
