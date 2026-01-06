@@ -1,7 +1,6 @@
 package DAO;
 
 import java.sql.*;
-
 public class UserDAO {
 
     private static final String URL = "jdbc:mysql://localhost:3306/bank_app";
@@ -12,8 +11,8 @@ public class UserDAO {
     public boolean saveUser(UserDetails user) {
 
         String insertSql = "INSERT INTO users " +
-                "(username, mobileNumber, adharNumber, panCard, userAddress, gender, password, balance) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+                "(username, mobileNumber, adharNumber, panCard, userAddress, gender, password) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
              PreparedStatement ps = conn.prepareStatement(insertSql, Statement.RETURN_GENERATED_KEYS)) {
@@ -25,7 +24,6 @@ public class UserDAO {
             ps.setString(5, user.getUserAddress());
             ps.setString(6, user.getGender());
             ps.setString(7, user.getPassword());
-            ps.setDouble(8, user.getBalance());
 
             ps.executeUpdate();
 
@@ -73,7 +71,6 @@ public class UserDAO {
                 user.setUserName(rs.getString("username"));
                 user.setMobileNumber(rs.getLong("mobileNumber"));
                 user.setAccountNumber(rs.getLong("accountNumber"));
-                user.setBalance(rs.getDouble("balance"));
                 user.setPassword(rs.getString("password"));
                 return user;
             }
@@ -101,4 +98,7 @@ public class UserDAO {
             return false;
         }
     }
+
+    
+    
 }
