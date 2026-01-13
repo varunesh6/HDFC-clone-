@@ -2,11 +2,13 @@ package implService;
 
 import DAO.UserDAO;
 import controller.InputUtils;
-import service.AccountService;
+import service.depositAmount;
+import service.withdrawAmount;
+import service.moneyTransfer;
 
-public class ImplAccService implements AccountService {
+public class ImplAccService implements depositAmount, withdrawAmount, moneyTransfer {
 
-    UserDAO userDAO = new UserDAO();
+    private final UserDAO userDAO = new UserDAO();
 
     @Override
     public void depositAmount() {
@@ -17,13 +19,13 @@ public class ImplAccService implements AccountService {
         System.out.print("Enter Deposit Amount: ");
         double amount = InputUtils.getScanner().nextDouble();
 
-        if (amount < 0) {
+        if (amount <= 0) {
             System.out.println("Amount must be greater than 0");
             return;
-        }else{
-            userDAO.deposit(accNo,amount);
-            System.out.println("Amount Deposit Successfully");
         }
+
+        userDAO.deposit(accNo, amount);
+        System.out.println("Amount Deposited Successfully");
     }
 
     @Override

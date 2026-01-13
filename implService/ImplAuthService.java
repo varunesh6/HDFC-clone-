@@ -3,9 +3,12 @@ package implService;
 import DAO.UserDAO;
 import DAO.UserDetails;
 import controller.InputUtils;
-import service.AuthService;
+import service.registerUser;
+import service.loginUser;  
+import service.closeAccount;
 
-public class ImplAuthService implements AuthService {
+
+public class ImplAuthService implements  registerUser, loginUser, closeAccount {
 
     private final UserDAO userDAO = new UserDAO();
         @Override

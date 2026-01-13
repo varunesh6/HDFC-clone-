@@ -1,17 +1,31 @@
 package controller;
 
-import service.AuthService;
-import service.AccountService;
-import service.TranscationService;
+import service.registerUser;
+import service.checkBalance;
+import service.userDetails;
+import service.transHistory;
+import service.depositAmount;
+import service.loginUser;
+import service.withdrawAmount;
+import service.moneyTransfer;
+import service.closeAccount;
 import implService.ImplAuthService;
 import implService.ImplAccService;
 import implService.ImplTransService;
 
 public class Main_Controller {
 
-    private final AuthService authService = new ImplAuthService();
-    private final AccountService accountService = new ImplAccService();
-    private final TranscationService transactionService = new ImplTransService();
+    private final registerUser registerUserControl = new ImplAuthService();
+    private final loginUser loginUserControl = new ImplAuthService();
+    private final closeAccount closeAccountControl = new ImplAuthService();
+
+    private final depositAmount depositAmountControl = new ImplAccService();
+    private final withdrawAmount withdrawAmountControl = new ImplAccService(); 
+    private final moneyTransfer moneyTransferControl = new ImplAccService();
+
+    private final checkBalance checkBalanceControl = new ImplTransService();
+    private final userDetails userDetailsControl = new ImplTransService();
+    private final transHistory transHistoryControl = new ImplTransService();
 
     // MAIN MENU
     public void startMainMenu() {
@@ -25,9 +39,9 @@ public class Main_Controller {
         int choice = InputUtils.getScanner().nextInt();
 
         switch (choice) {
-            case 1 -> authService.registerUser();
+            case 1 -> registerUserControl.registerUser();
             case 2 -> {
-                if (authService.loginUser()) {
+                if (loginUserControl.loginUser()) {
                     startServiceMenu();   
                 }
             }
@@ -60,14 +74,14 @@ public class Main_Controller {
             int choice = InputUtils.getScanner().nextInt();
 
             switch (choice) {
-                case 3 -> accountService.depositAmount();
-                case 4 -> accountService.withdrawAmount();
-                case 5 -> accountService.moneyTransfer();
-                case 6 -> transactionService.userDetails();
-                case 7 -> transactionService.checkBalance();
-                case 8 -> transactionService.transHistory();
+                case 3 -> depositAmountControl.depositAmount();
+                case 4 -> withdrawAmountControl.withdrawAmount();
+                case 5 -> moneyTransferControl.moneyTransfer();
+                case 6 -> userDetailsControl.userDetails();
+                case 7 -> checkBalanceControl.checkBalance();
+                case 8 -> transHistoryControl.transHistory();
                 case 9 -> {
-                    authService.closeAccount();
+                    closeAccountControl.closeAccount();
                     isLoggedIn = false;
                 }
                 case 10 -> {
