@@ -7,6 +7,51 @@ public class UserDAO {
 	private static final String USER = "root";
 	private static final String PASSWORD = "2023Ucs1216*";
 
+	public boolean withdraw(long accountNumber, double amount) {
+
+    String getUserSql = "SELECT userId, balance FROM users WHERE accountNumber=?";
+    String insertTxnSql = "INSERT INTO transactions (userId, type, amount) VALUES (?, 'WITHDRAW', ?)";
+    String updateBalanceSql = "UPDATE users SET balance = balance - ? WHERE userId=?";
+
+    try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD)) {
+        conn.setAutoCommit(false);
+
+        PreparedStatement ps1 = conn.prepareStatement(getUserSql);
+        ps1.setLong(1, accountNumber);
+        ResultSet rs = ps1.executeQuery();
+
+        if (!rs.next()) {
+            return false;
+        }
+
+        int userId = rs.getInt("userId");
+        double balance = rs.getDouble("balance");
+
+        if (balance < amount) {
+            return false; 
+        }
+
+
+        PreparedStatement ps2 = conn.prepareStatement(insertTxnSql);
+        ps2.setInt(1, userId);
+        ps2.setDouble(2, amount);
+        ps2.executeUpdate();
+
+        PreparedStatement ps3 = conn.prepareStatement(updateBalanceSql);
+        ps3.setDouble(1, amount);
+        ps3.setInt(2, userId);
+        ps3.executeUpdate();
+
+        conn.commit();
+        return true;
+
+    } catch (SQLException e) {
+        e.printStackTrace();
+        return false;
+    }
+}
+
+
 	
 public boolean deposit(long accountNumber, double amount) {
 

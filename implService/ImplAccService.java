@@ -30,7 +30,21 @@ public class ImplAccService implements depositAmount, withdrawAmount, moneyTrans
 
     @Override
     public void withdrawAmount() {
-        System.out.println("Withdraw not implemented yet");
+        System.out.print("Enter Account Number: ");
+        long accNo = InputUtils.getScanner().nextLong();
+
+        System.out.print("Enter Withdraw Amount: ");
+        double amount = InputUtils.getScanner().nextDouble();
+
+        
+        if (amount <= 0) {
+            System.out.println("Amount must be greater than 0");
+            return;
+        }
+
+        userDAO.withdraw(accNo, amount);
+        System.out.println("Amount Deposited Successfully");
+
     }
 
     @Override
