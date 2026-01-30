@@ -7,89 +7,110 @@ public class UserDAO {
 	private static final String USER = "root";
 	private static final String PASSWORD = "2023Ucs1216*";
 
+	public double checkBalance(long accountNumber) {
+
+		String getUserSql = "SELECT balance FROM users WHERE accountNumber=?";
+
+		try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
+			        PreparedStatement ps = conn.prepareStatement(getUserSql)) {
+
+			ps.setLong(1, accountNumber);
+			ResultSet rs = ps.executeQuery();
+
+			if (rs.next()) {
+				return rs.getDouble("balance");
+			}
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return 0;
+	}
+
+
 	public boolean withdraw(long accountNumber, double amount) {
 
-    String getUserSql = "SELECT userId, balance FROM users WHERE accountNumber=?";
-    String insertTxnSql = "INSERT INTO transactions (userId, type, amount) VALUES (?, 'WITHDRAW', ?)";
-    String updateBalanceSql = "UPDATE users SET balance = balance - ? WHERE userId=?";
+		String getUserSql = "SELECT userId, balance FROM users WHERE accountNumber=?";
+		String insertTxnSql = "INSERT INTO transactions (userId, type, amount) VALUES (?, 'WITHDRAW', ?)";
+		String updateBalanceSql = "UPDATE users SET balance = balance - ? WHERE userId=?";
 
-    try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD)) {
-        conn.setAutoCommit(false);
+		try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD)) {
+			conn.setAutoCommit(false);
 
-        PreparedStatement ps1 = conn.prepareStatement(getUserSql);
-        ps1.setLong(1, accountNumber);
-        ResultSet rs = ps1.executeQuery();
+			PreparedStatement ps1 = conn.prepareStatement(getUserSql);
+			ps1.setLong(1, accountNumber);
+			ResultSet rs = ps1.executeQuery();
 
-        if (!rs.next()) {
-            return false;
-        }
+			if (!rs.next()) {
+				return false;
+			}
 
-        int userId = rs.getInt("userId");
-        double balance = rs.getDouble("balance");
+			int userId = rs.getInt("userId");
+			double balance = rs.getDouble("balance");
 
-        if (balance < amount) {
-            return false; 
-        }
-
-
-        PreparedStatement ps2 = conn.prepareStatement(insertTxnSql);
-        ps2.setInt(1, userId);
-        ps2.setDouble(2, amount);
-        ps2.executeUpdate();
-
-        PreparedStatement ps3 = conn.prepareStatement(updateBalanceSql);
-        ps3.setDouble(1, amount);
-        ps3.setInt(2, userId);
-        ps3.executeUpdate();
-
-        conn.commit();
-        return true;
-
-    } catch (SQLException e) {
-        e.printStackTrace();
-        return false;
-    }
-}
+			if (balance < amount) {
+				return false;
+			}
 
 
-	
-public boolean deposit(long accountNumber, double amount) {
+			PreparedStatement ps2 = conn.prepareStatement(insertTxnSql);
+			ps2.setInt(1, userId);
+			ps2.setDouble(2, amount);
+			ps2.executeUpdate();
 
-    String getUserSql = "SELECT userId FROM users WHERE accountNumber=?";
-    String insertTxnSql = "INSERT INTO transactions (userId, type, amount) VALUES (?, 'DEPOSIT', ?)";
-    String updateBalanceSql = "UPDATE users SET balance = balance + ? WHERE userId=?";
+			PreparedStatement ps3 = conn.prepareStatement(updateBalanceSql);
+			ps3.setDouble(1, amount);
+			ps3.setInt(2, userId);
+			ps3.executeUpdate();
 
-    try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD)) {
-        conn.setAutoCommit(false);
+			conn.commit();
+			return true;
 
-        PreparedStatement ps1 = conn.prepareStatement(getUserSql);
-        ps1.setLong(1, accountNumber);
-        ResultSet rs = ps1.executeQuery();
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
 
-        if (!rs.next()) {
-            return false;
-        }
 
-        int userId = rs.getInt("userId");
 
-        PreparedStatement ps2 = conn.prepareStatement(insertTxnSql);
-        ps2.setInt(1, userId);
-        ps2.setDouble(2, amount);
-        ps2.executeUpdate();
+	public boolean deposit(long accountNumber, double amount) {
 
-        PreparedStatement ps3 = conn.prepareStatement(updateBalanceSql);
-        ps3.setDouble(1, amount);
-        ps3.setInt(2, userId);
-        ps3.executeUpdate();
+		String getUserSql = "SELECT userId FROM users WHERE accountNumber=?";
+		String insertTxnSql = "INSERT INTO transactions (userId, type, amount) VALUES (?, 'DEPOSIT', ?)";
+		String updateBalanceSql = "UPDATE users SET balance = balance + ? WHERE userId=?";
 
-        conn.commit();
-        return true;
+		try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD)) {
+			conn.setAutoCommit(false);
 
-    } catch (SQLException e) {
-        e.printStackTrace();
-        return false;
-    }
-}
+			PreparedStatement ps1 = conn.prepareStatement(getUserSql);
+			ps1.setLong(1, accountNumber);
+			ResultSet rs = ps1.executeQuery();
+
+			if (!rs.next()) {
+				return false;
+			}
+
+			int userId = rs.getInt("userId");
+
+			PreparedStatement ps2 = conn.prepareStatement(insertTxnSql);
+			ps2.setInt(1, userId);
+			ps2.setDouble(2, amount);
+			ps2.executeUpdate();
+
+			PreparedStatement ps3 = conn.prepareStatement(updateBalanceSql);
+			ps3.setDouble(1, amount);
+			ps3.setInt(2, userId);
+			ps3.executeUpdate();
+
+			conn.commit();
+			return true;
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
 
 
 
