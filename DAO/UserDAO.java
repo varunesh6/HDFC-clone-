@@ -7,6 +7,121 @@ public class UserDAO {
 	private static final String USER = "root";
 	private static final String PASSWORD = "2023Ucs1216*";
 
+
+	public boolean transfer(long fromAccNo, long toAccNo, double amount) {
+
+		String getUserSql = "SELECT userId, balance FROM users WHERE accountNumber=?";
+		String debitSql   = "UPDATE users SET balance = balance - ? WHERE userId=?";
+		String creditSql  = "UPDATE users SET balance = balance + ? WHERE userId=?";
+		String txnSql     = "INSERT INTO transactions (userId, type, amount) VALUES (?, ?, ?)";
+
+		try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD)) {
+			conn.setAutoCommit(false);
+
+			// ===== FROM ACCOUNT =====
+			PreparedStatement psFrom = conn.prepareStatement(getUserSql);
+			psFrom.setLong(1, fromAccNo);
+			ResultSet rsFrom = psFrom.executeQuery();
+
+			if (!rsFrom.next()) return false;
+
+			int fromUserId = rsFrom.getInt("userId");
+			double fromBalance = rsFrom.getDouble("balance");
+
+			if (fromBalance < amount) return false;
+
+			// ===== TO ACCOUNT =====
+			PreparedStatement psTo = conn.prepareStatement(getUserSql);
+			psTo.setLong(1, toAccNo);
+			ResultSet rsTo = psTo.executeQuery();
+
+			if (!rsTo.next()) return false;
+
+			int toUserId = rsTo.getInt("userId");
+
+			// ===== DEBIT =====
+			PreparedStatement psDebit = conn.prepareStatement(debitSql);
+			psDebit.setDouble(1, amount);
+			psDebit.setInt(2, fromUserId);
+			psDebit.executeUpdate();
+
+			// ===== CREDIT =====
+			PreparedStatement psCredit = conn.prepareStatement(creditSql);
+			psCredit.setDouble(1, amount);
+			psCredit.setInt(2, toUserId);
+			psCredit.executeUpdate();
+
+			// ===== TRANSACTIONS =====
+			PreparedStatement psTxn1 = conn.prepareStatement(txnSql);
+			psTxn1.setInt(1, fromUserId);
+			psTxn1.setString(2, "TRANSFER_OUT");
+			psTxn1.setDouble(3, amount);
+			psTxn1.executeUpdate();
+
+			PreparedStatement psTxn2 = conn.prepareStatement(txnSql);
+			psTxn2.setInt(1, toUserId);
+			psTxn2.setString(2, "TRANSFER_IN");
+			psTxn2.setDouble(3, amount);
+			psTxn2.executeUpdate();
+
+			conn.commit();
+			return true;
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+
+
+	public void transactionHistory(long accountNumber) {
+
+		String getUserSql = "SELECT userId FROM users WHERE accountNumber=?";
+		String txnSql = "SELECT type, amount, created_at FROM transactions WHERE userId=? ORDER BY created_at DESC";
+
+		try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD)) {
+
+			// 1. Get userId
+			PreparedStatement ps1 = conn.prepareStatement(getUserSql);
+			ps1.setLong(1, accountNumber);
+			ResultSet rs1 = ps1.executeQuery();
+
+			if (!rs1.next()) {
+				System.out.println("Account not found");
+				return;
+			}
+
+			int userId = rs1.getInt("userId");
+
+			// 2. Get transactions
+			PreparedStatement ps2 = conn.prepareStatement(txnSql);
+			ps2.setInt(1, userId);
+			ResultSet rs2 = ps2.executeQuery();
+
+			System.out.println("\n----- Transaction History -----");
+			System.out.printf("%-15s %-10s %-20s%n", "Type", "Amount", "Date");
+
+			boolean hasData = false;
+			while (rs2.next()) {
+				hasData = true;
+				System.out.printf(
+				    "%-15s %-10.2f %-20s%n",
+				    rs2.getString("type"),
+				    rs2.getDouble("amount"),
+				    rs2.getTimestamp("created_at")
+				);
+			}
+
+			if (!hasData) {
+				System.out.println("No transactions found");
+			}
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+
+
 	public double checkBalance(long accountNumber) {
 
 		String getUserSql = "SELECT balance FROM users WHERE accountNumber=?";

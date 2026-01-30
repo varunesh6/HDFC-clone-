@@ -26,7 +26,7 @@ public class ImplAccService implements depositAmount, withdrawAmount, moneyTrans
 
 		userDAO.deposit(accNo, amount);
 		System.out.println("Amount Deposited Successfully");
-        System.out.println("Current Balance: " + userDAO.checkBalance(accNo));
+		System.out.println("Current Balance: " + userDAO.checkBalance(accNo));
 	}
 
 	@Override
@@ -45,11 +45,29 @@ public class ImplAccService implements depositAmount, withdrawAmount, moneyTrans
 
 		userDAO.withdraw(accNo, amount);
 		System.out.println("Amount Deposited Successfully");
-        System.out.println("Current Balance: " + userDAO.checkBalance(accNo));
+		System.out.println("Current Balance: " + userDAO.checkBalance(accNo));
 	}
 
 	@Override
 	public void moneyTransfer() {
-        System.out.println("money transfer");
+		System.out.print("Enter From Account Number: ");
+		long fromAccNo = InputUtils.getScanner().nextLong();
+
+		System.out.print("Enter To Account Number: ");
+		long toAccNo = InputUtils.getScanner().nextLong();
+
+		System.out.print("Enter Amount: ");
+		double amount = InputUtils.getScanner().nextDouble();
+
+		boolean success = userDAO.transfer(fromAccNo, toAccNo, amount);
+
+		if (success) {
+			System.out.println(" Transfer successful");
+		} else {
+			System.out.println(" Transfer failed");
+		}
+
+
+
 	}
 }

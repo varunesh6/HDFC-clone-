@@ -24,7 +24,12 @@ public class ImplTransService implements userDetails,checkBalance,transHistory {
 		}
 	}
 	@Override
-	public void transHistory() {
-		System.out.println("Transaction History Displayed");
-	}
+    public void transHistory() {
+
+    System.out.print("Enter Account Number: ");
+    long accNo = InputUtils.getScanner().nextLong();
+
+    userDAO.transactionHistory(accNo);
+}
+
 }
