@@ -8,6 +8,37 @@ public class UserDAO {
 	private static final String PASSWORD = "2023Ucs1216*";
 
 
+	public UserDetails getUserDetails(long accountNumber) {
+
+    String sql = "SELECT * FROM users WHERE accountNumber=?";
+
+    try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
+         PreparedStatement ps = conn.prepareStatement(sql)) {
+
+        ps.setLong(1, accountNumber);
+        ResultSet rs = ps.executeQuery();
+
+        if (rs.next()) {
+            UserDetails user = new UserDetails();
+            user.setUserId(rs.getInt("userId"));
+            user.setUserName(rs.getString("username"));
+            user.setMobileNumber(rs.getLong("mobileNumber"));
+            user.setAdharNumber(rs.getString("adharNumber"));
+            user.setPanCard(rs.getString("panCard"));
+            user.setUserAddress(rs.getString("userAddress"));
+            user.setGender(rs.getString("gender"));
+            user.setAccountNumber(rs.getLong("accountNumber"));
+            user.setBalance(rs.getDouble("balance"));
+            return user;
+        }
+
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return null;
+}
+
+
 	public boolean transfer(long fromAccNo, long toAccNo, double amount) {
 
 		String getUserSql = "SELECT userId, balance FROM users WHERE accountNumber=?";

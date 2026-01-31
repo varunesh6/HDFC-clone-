@@ -1,35 +1,55 @@
 package implService;
+
 import DAO.UserDAO;
-import controller.InputUtils;
+import DAO.UserDetails;
 import service.checkBalance;
 import service.userDetails;
 import service.transHistory;
+import session.UserSession;
 
-public class ImplTransService implements userDetails,checkBalance,transHistory {
-	private final UserDAO userDAO = new UserDAO();
-	@Override
-	public void userDetails() {
-		System.out.println("User Details Displayed");
-	}
-	@Override
-	public void checkBalance() {
-		System.out.print("Enter Account Number: ");
-		long accNo = InputUtils.getScanner().nextLong();
-		double balance = userDAO.checkBalance(accNo);
+public class ImplTransService implements userDetails, checkBalance, transHistory {
 
-		if (balance >= 0) {
-			System.out.println("Current Balance: " + balance);
-		} else {
-			System.out.println("Account not found");
-		}
-	}
-	@Override
+    private final UserDAO userDAO = new UserDAO();
+
+    @Override
+    public void userDetails() {
+
+        if (!UserSession.isLoggedIn()) {
+            System.out.println(" Please login first");
+            return;
+        }
+
+        UserDetails user = UserSession.getCurrentUser();
+        UserDetails full = userDAO.getUserDetails(user.getAccountNumber());
+
+        System.out.println("Name: " + full.getUserName());
+        System.out.println("Account: " + full.getAccountNumber());
+        System.out.println("Balance: " + full.getBalance());
+    }
+
+    @Override
+    public void checkBalance() {
+
+        if (!UserSession.isLoggedIn()) {
+            System.out.println(" Please login first");
+            return;
+        }
+
+        UserDetails user = UserSession.getCurrentUser();
+        double balance = userDAO.checkBalance(user.getAccountNumber());
+
+        System.out.println(" Balance: " + balance);
+    }
+
+    @Override
     public void transHistory() {
 
-    System.out.print("Enter Account Number: ");
-    long accNo = InputUtils.getScanner().nextLong();
+        if (!UserSession.isLoggedIn()) {
+            System.out.println(" Please login first");
+            return;
+        }
 
-    userDAO.transactionHistory(accNo);
-}
-
+        UserDetails user = UserSession.getCurrentUser();
+        userDAO.transactionHistory(user.getAccountNumber());
+    }
 }

@@ -1,73 +1,73 @@
 package implService;
 
 import DAO.UserDAO;
+import DAO.UserDetails;
 import controller.InputUtils;
 import service.depositAmount;
 import service.withdrawAmount;
 import service.moneyTransfer;
+import session.UserSession;
 
 public class ImplAccService implements depositAmount, withdrawAmount, moneyTransfer {
 
-	private final UserDAO userDAO = new UserDAO();
+    private final UserDAO userDAO = new UserDAO();
 
-	@Override
-	public void depositAmount() {
+    @Override
+    public void depositAmount() {
 
-		System.out.print("Enter Account Number: ");
-		long accNo = InputUtils.getScanner().nextLong();
+        if (!UserSession.isLoggedIn()) {
+            System.out.println(" Please login first");
+            return;
+        }
 
-		System.out.print("Enter Deposit Amount: ");
-		double amount = InputUtils.getScanner().nextDouble();
+        UserDetails user = UserSession.getCurrentUser();
 
-		if (amount <= 0) {
-			System.out.println("Amount must be greater than 0");
-			return;
-		}
+        System.out.print("Enter Deposit Amount: ");
+        double amount = InputUtils.getScanner().nextDouble();
 
-		userDAO.deposit(accNo, amount);
-		System.out.println("Amount Deposited Successfully");
-		System.out.println("Current Balance: " + userDAO.checkBalance(accNo));
-	}
+        userDAO.deposit(user.getAccountNumber(), amount);
+        System.out.println(" Deposit Successful");
+    }
 
-	@Override
-	public void withdrawAmount() {
-		System.out.print("Enter Account Number: ");
-		long accNo = InputUtils.getScanner().nextLong();
+    @Override
+    public void withdrawAmount() {
 
-		System.out.print("Enter Withdraw Amount: ");
-		double amount = InputUtils.getScanner().nextDouble();
+        if (!UserSession.isLoggedIn()) {
+            System.out.println(" Please login first");
+            return;
+        }
 
+        UserDetails user = UserSession.getCurrentUser();
 
-		if (amount <= 0) {
-			System.out.println("Amount must be greater than 0");
-			return;
-		}
+        System.out.print("Enter Withdraw Amount: ");
+        double amount = InputUtils.getScanner().nextDouble();
 
-		userDAO.withdraw(accNo, amount);
-		System.out.println("Amount Deposited Successfully");
-		System.out.println("Current Balance: " + userDAO.checkBalance(accNo));
-	}
+        userDAO.withdraw(user.getAccountNumber(), amount);
+        System.out.println(" Withdraw Successful");
+    }
 
-	@Override
-	public void moneyTransfer() {
-		System.out.print("Enter From Account Number: ");
-		long fromAccNo = InputUtils.getScanner().nextLong();
+    @Override
+    public void moneyTransfer() {
 
-		System.out.print("Enter To Account Number: ");
-		long toAccNo = InputUtils.getScanner().nextLong();
+        if (!UserSession.isLoggedIn()) {
+            System.out.println(" Please login first");
+            return;
+        }
 
-		System.out.print("Enter Amount: ");
-		double amount = InputUtils.getScanner().nextDouble();
+        UserDetails user = UserSession.getCurrentUser();
 
-		boolean success = userDAO.transfer(fromAccNo, toAccNo, amount);
+        System.out.print("Enter To Account Number: ");
+        long toAcc = InputUtils.getScanner().nextLong();
 
-		if (success) {
-			System.out.println(" Transfer successful");
-		} else {
-			System.out.println(" Transfer failed");
-		}
+        System.out.print("Enter Amount: ");
+        double amount = InputUtils.getScanner().nextDouble();
 
+        boolean success = userDAO.transfer(
+            user.getAccountNumber(),
+            toAcc,
+            amount
+        );
 
-
-	}
+        System.out.println(success ? " Transfer Successful" : " Transfer Failed");
+    }
 }
